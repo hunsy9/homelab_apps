@@ -17,11 +17,10 @@ metadata:
   namespace: default
 spec:
   entryPoints:
-    - websecure
+    - web
   routes:
     - match: Host(`hello.seung.site`)
       kind: Rule
       services:
         - name: hello-world
           port: 80
-  tls: {}
