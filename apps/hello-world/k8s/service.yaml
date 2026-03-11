@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world
+  namespace: default
+spec:
+  selector:
+    app: hello-world
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: hello-world
+  namespace: default
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`hello.seung.site`)
+      kind: Rule
+      services:
+        - name: hello-world
+          port: 80
+  tls: {}
