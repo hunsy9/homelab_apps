@@ -11,6 +11,44 @@ onMounted(() => {
 
 const readyNodes = computed(() => store.nodes.filter(n => n.status === 'Ready').length)
 const totalNodes = computed(() => store.nodes.length)
+
+const services = [
+  {
+    name: 'Traefik',
+    url: 'https://traefik.seung.site',
+    description: 'Ingress Controller Dashboard',
+    icon: '🔀',
+    color: 'from-cyan-500 to-blue-500'
+  },
+  {
+    name: 'Longhorn',
+    url: 'https://longhorn.seung.site',
+    description: 'Distributed Storage',
+    icon: '💾',
+    color: 'from-red-500 to-orange-500'
+  },
+  {
+    name: 'Grafana',
+    url: 'https://grafana.seung.site',
+    description: 'Monitoring & Dashboards',
+    icon: '📊',
+    color: 'from-orange-500 to-yellow-500'
+  },
+  {
+    name: 'Harbor',
+    url: 'https://harbor.seung.site',
+    description: 'Container Registry',
+    icon: '🐳',
+    color: 'from-blue-500 to-indigo-500'
+  },
+  {
+    name: 'Hello World',
+    url: 'https://hello.seung.site',
+    description: 'Test Application',
+    icon: '👋',
+    color: 'from-green-500 to-teal-500'
+  }
+]
 </script>
 
 <template>
@@ -40,6 +78,33 @@ const totalNodes = computed(() => store.nodes.length)
         <div class="text-3xl font-bold" :class="readyNodes === totalNodes ? 'text-green-400' : 'text-yellow-400'">
           {{ readyNodes === totalNodes ? 'Healthy' : 'Degraded' }}
         </div>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold mb-4">Services</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <a
+          v-for="service in services"
+          :key="service.name"
+          :href="service.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group relative overflow-hidden rounded-lg p-4 bg-gray-800 hover:scale-105 transition-all duration-200"
+        >
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity bg-gradient-to-br" :class="service.color"></div>
+          <div class="relative">
+            <div class="text-3xl mb-2">{{ service.icon }}</div>
+            <div class="font-semibold text-white group-hover:text-blue-400 transition-colors">
+              {{ service.name }}
+            </div>
+            <div class="text-xs text-gray-500 mt-1">{{ service.description }}</div>
+          </div>
+          <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400">
+            ↗
+          </div>
+        </a>
       </div>
     </div>
 
