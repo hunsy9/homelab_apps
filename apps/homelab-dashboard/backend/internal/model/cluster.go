@@ -7,8 +7,14 @@ type Node struct {
 	IP        string            `json:"ip"`
 	CPU       ResourceInfo      `json:"cpu"`
 	Memory    ResourceInfo      `json:"memory"`
+	Storage   StorageInfo       `json:"storage"`
 	Labels    map[string]string `json:"labels"`
 	CreatedAt string            `json:"createdAt"`
+}
+
+type StorageInfo struct {
+	Capacity int64 `json:"capacity"` // bytes
+	Usage    int64 `json:"usage"`    // bytes
 }
 
 type ResourceInfo struct {

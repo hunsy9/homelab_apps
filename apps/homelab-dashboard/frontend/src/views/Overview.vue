@@ -179,7 +179,7 @@ function getProgressColor(percent: number): string {
           </div>
 
           <!-- Memory -->
-          <div>
+          <div class="mb-3">
             <div class="flex justify-between text-xs text-gray-400 mb-1">
               <span>Memory</span>
               <span>{{ formatMemory(node.memory.usage) }} / {{ formatMemory(node.memory.allocatable) }}</span>
@@ -189,6 +189,21 @@ function getProgressColor(percent: number): string {
                 class="h-full rounded-full transition-all"
                 :class="getProgressColor(getUsagePercent(node.memory.usage, node.memory.allocatable))"
                 :style="{ width: `${getUsagePercent(node.memory.usage, node.memory.allocatable)}%` }"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Storage -->
+          <div>
+            <div class="flex justify-between text-xs text-gray-400 mb-1">
+              <span>Disk</span>
+              <span>{{ formatMemory(node.storage.usage) }} / {{ formatMemory(node.storage.capacity) }}</span>
+            </div>
+            <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div
+                class="h-full rounded-full transition-all"
+                :class="getProgressColor(getUsagePercent(node.storage.usage, node.storage.capacity))"
+                :style="{ width: `${getUsagePercent(node.storage.usage, node.storage.capacity)}%` }"
               ></div>
             </div>
           </div>

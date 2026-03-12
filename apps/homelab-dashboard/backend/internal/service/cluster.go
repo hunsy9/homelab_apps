@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -10,6 +11,16 @@ import (
 
 	"homelab-dashboard/internal/model"
 )
+
+type nodeStatsSummary struct {
+	Node struct {
+		Fs struct {
+			CapacityBytes  int64 `json:"capacityBytes"`
+			UsedBytes      int64 `json:"usedBytes"`
+			AvailableBytes int64 `json:"availableBytes"`
+		} `json:"fs"`
+	} `json:"node"`
+}
 
 type ClusterService struct {
 	client        *kubernetes.Clientset
@@ -26,7 +37,7 @@ func (s *ClusterService) GetNodes(ctx context.Context) ([]model.Node, error) {
 		return nil, err
 	}
 
-	// Fetch metrics
+	// Fetch CPU/Memory metrics
 	metricsMap := make(map[string]struct {
 		cpuUsage    int64
 		memoryUsage int64
@@ -47,9 +58,22 @@ func (s *ClusterService) GetNodes(ctx context.Context) ([]model.Node, error) {
 		}
 	}
 
+	// Fetch storage stats from kubelet
+	storageMap := make(map[string]model.StorageInfo)
+	for _, n := range nodes.Items {
+		stats := s.getNodeStats(ctx, n.Name)
+		if stats != nil {
+			storageMap[n.Name] = model.StorageInfo{
+				Capacity: stats.Node.Fs.CapacityBytes,
+				Usage:    stats.Node.Fs.UsedBytes,
+			}
+		}
+	}
+
 	result := make([]model.Node, 0, len(nodes.Items))
 	for _, n := range nodes.Items {
 		metrics := metricsMap[n.Name]
+		storage := storageMap[n.Name]
 
 		node := model.Node{
 			Name:      n.Name,
@@ -66,10 +90,29 @@ func (s *ClusterService) GetNodes(ctx context.Context) ([]model.Node, error) {
 				Allocatable: n.Status.Allocatable.Memory().Value(),
 				Usage:       metrics.memoryUsage,
 			},
+			Storage: storage,
 		}
 		result = append(result, node)
 	}
 	return result, nil
+}
+
+func (s *ClusterService) getNodeStats(ctx context.Context, nodeName string) *nodeStatsSummary {
+	data, err := s.client.CoreV1().RESTClient().Get().
+		Resource("nodes").
+		Name(nodeName).
+		SubResource("proxy").
+		Suffix("stats/summary").
+		Do(ctx).Raw()
+	if err != nil {
+		return nil
+	}
+
+	var stats nodeStatsSummary
+	if err := json.Unmarshal(data, &stats); err != nil {
+		return nil
+	}
+	return &stats
 }
 
 func (s *ClusterService) GetNamespaces(ctx context.Context) ([]model.Namespace, error) {

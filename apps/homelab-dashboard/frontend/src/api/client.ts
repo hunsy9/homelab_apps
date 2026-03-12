@@ -13,6 +13,11 @@ export interface ResourceInfo {
   usage: number
 }
 
+export interface StorageInfo {
+  capacity: number
+  usage: number
+}
+
 export interface Node {
   name: string
   status: string
@@ -20,6 +25,7 @@ export interface Node {
   ip: string
   cpu: ResourceInfo
   memory: ResourceInfo
+  storage: StorageInfo
   labels: Record<string, string>
   createdAt: string
 }
