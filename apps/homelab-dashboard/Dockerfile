@@ -9,9 +9,8 @@ RUN npm run build
 # Build backend
 FROM golang:1.22-alpine AS backend-builder
 WORKDIR /app
-COPY backend/go.mod backend/go.sum ./
-RUN go mod download
 COPY backend/ ./
+RUN go mod tidy
 COPY --from=frontend-builder /app/backend/static ./static
 RUN CGO_ENABLED=0 GOOS=linux go build -o /homelab-dashboard ./cmd/main.go
 
