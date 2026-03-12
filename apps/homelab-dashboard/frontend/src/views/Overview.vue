@@ -15,7 +15,7 @@ const totalNodes = computed(() => store.nodes.length)
 const services = [
   {
     name: 'Traefik',
-    url: 'https://traefik.seung.site',
+    url: 'https://traefik.seung.site/dashboard/',
     description: 'Ingress Controller Dashboard',
     icon: '🔀',
     color: 'from-cyan-500 to-blue-500'
