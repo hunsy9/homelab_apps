@@ -16,7 +16,7 @@ spec:
       serviceAccountName: homelab-dashboard
       containers:
       - name: homelab-dashboard
-        image: harbor.seung.site/homelab/homelab-dashboard:latest
+        image: harbor.seung.site/homelab/homelab-dashboard:7b504365543b3f3241297bae4b03bda2417a36e2
         ports:
         - containerPort: 8080
         resources:
