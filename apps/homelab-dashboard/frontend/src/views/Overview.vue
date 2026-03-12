@@ -35,35 +35,30 @@ const services = [
     name: 'ArgoCD',
     url: 'https://argocd.seung.site',
     description: 'GitOps Continuous Delivery',
-    icon: '🔄',
     color: 'from-orange-500 to-red-500'
   },
   {
     name: 'Traefik',
     url: 'https://traefik.seung.site/dashboard/',
     description: 'Ingress Controller Dashboard',
-    icon: '🔀',
     color: 'from-cyan-500 to-blue-500'
   },
   {
     name: 'Longhorn',
     url: 'https://longhorn.seung.site',
     description: 'Distributed Storage',
-    icon: '💾',
     color: 'from-red-500 to-orange-500'
   },
   {
     name: 'Grafana',
     url: 'https://grafana.seung.site',
     description: 'Monitoring & Dashboards',
-    icon: '📊',
     color: 'from-orange-500 to-yellow-500'
   },
   {
     name: 'Harbor',
     url: 'https://harbor.seung.site',
     description: 'Container Registry',
-    icon: '🐳',
     color: 'from-blue-500 to-indigo-500'
   }
 ]
@@ -140,7 +135,29 @@ function getProgressColor(percent: number): string {
         >
           <div class="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity bg-gradient-to-br" :class="service.color"></div>
           <div class="relative">
-            <div class="text-3xl mb-2">{{ service.icon }}</div>
+            <div class="w-8 h-8 mb-2">
+              <!-- ArgoCD -->
+              <svg v-if="service.name === 'ArgoCD'" viewBox="0 0 24 24" fill="currentColor" class="text-orange-500">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm0 2.2c5.4 0 9.8 4.4 9.8 9.8s-4.4 9.8-9.8 9.8S2.2 17.4 2.2 12 6.6 2.2 12 2.2zm-1.3 4.5L7 12l3.7 5.3h2.6L10.2 12l3.1-5.3h-2.6zm4 0L11 12l3.7 5.3h2.6L14.2 12l3.1-5.3h-2.6z"/>
+              </svg>
+              <!-- Traefik -->
+              <svg v-else-if="service.name === 'Traefik'" viewBox="0 0 24 24" fill="currentColor" class="text-cyan-400">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm-.5 3.5l7 5.5-7 5.5v-3.3H6V8.8h5.5V3.5zm1 10l7 5.5-7 5.5v-3.3H6v-4.4h6.5V13.5z"/>
+              </svg>
+              <!-- Longhorn -->
+              <svg v-else-if="service.name === 'Longhorn'" viewBox="0 0 24 24" fill="currentColor" class="text-red-500">
+                <path d="M21 3H3v18h18V3zM10 17H7v-4h3v4zm0-6H7V7h3v4zm7 6h-5v-4h5v4zm0-6h-5V7h5v4z"/>
+              </svg>
+              <!-- Grafana -->
+              <svg v-else-if="service.name === 'Grafana'" viewBox="0 0 24 24" fill="currentColor" class="text-orange-400">
+                <path d="M22.6 10.9c-.1-.5-.2-1.1-.4-1.6-.1-.3-.4-.5-.7-.5h-1.3c-.2-.5-.4-.9-.7-1.4l.9-.9c.2-.2.3-.6.1-.9-.3-.5-.7-.9-1.1-1.3-.2-.2-.3-.3-.5-.4-.3-.2-.6-.1-.9.1l-.9.9c-.4-.3-.9-.5-1.4-.7V2.9c0-.3-.2-.6-.5-.7-.5-.2-1.1-.3-1.6-.4-.3 0-.6.1-.8.4L12 3.4l-.8-1.2c-.2-.3-.5-.4-.8-.4-.5.1-1.1.2-1.6.4-.3.1-.5.4-.5.7v1.3c-.5.2-.9.4-1.4.7l-.9-.9c-.2-.2-.6-.3-.9-.1-.5.3-.9.7-1.3 1.1-.2.2-.3.3-.4.5-.2.3-.1.6.1.9l.9.9c-.3.4-.5.9-.7 1.4H2.4c-.3 0-.6.2-.7.5-.2.5-.3 1.1-.4 1.6 0 .3.1.6.4.8l1.2.8-1.2.8c-.3.2-.4.5-.4.8.1.5.2 1.1.4 1.6.1.3.4.5.7.5h1.3c.2.5.4.9.7 1.4l-.9.9c-.2.2-.3.6-.1.9.3.5.7.9 1.1 1.3.2.2.3.3.5.4.3.2.6.1.9-.1l.9-.9c.4.3.9.5 1.4.7v1.3c0 .3.2.6.5.7.5.2 1.1.3 1.6.4.3 0 .6-.1.8-.4l.8-1.2.8 1.2c.2.3.5.4.8.4.5-.1 1.1-.2 1.6-.4.3-.1.5-.4.5-.7v-1.3c.5-.2.9-.4 1.4-.7l.9.9c.2.2.6.3.9.1.5-.3.9-.7 1.3-1.1.2-.2.3-.3.4-.5.2-.3.1-.6-.1-.9l-.9-.9c.3-.4.5-.9.7-1.4h1.3c.3 0 .6-.2.7-.5.2-.5.3-1.1.4-1.6 0-.3-.1-.6-.4-.8l-1.2-.8 1.2-.8c.3-.2.4-.5.4-.8zM12 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/>
+              </svg>
+              <!-- Harbor -->
+              <svg v-else-if="service.name === 'Harbor'" viewBox="0 0 24 24" fill="currentColor" class="text-blue-400">
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm-1-13h2v6h-2V7zm0 8h2v2h-2v-2z"/>
+                <path d="M8 10h2v5H8v-5zm6 0h2v5h-2v-5z"/>
+              </svg>
+            </div>
             <div class="font-semibold text-white group-hover:text-blue-400 transition-colors">
               {{ service.name }}
             </div>
