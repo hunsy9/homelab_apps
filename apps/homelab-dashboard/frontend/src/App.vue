@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { RouterLink, RouterView } from 'vue-router'
 
 const sidebarOpen = ref(false)
-const route = useRoute()
 
 function closeSidebar() {
   sidebarOpen.value = false
