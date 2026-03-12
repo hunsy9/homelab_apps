@@ -1,12 +1,30 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed, ref } from 'vue'
 import { useClusterStore } from '../stores/cluster'
 
 const store = useClusterStore()
+const refreshInterval = ref<number | null>(null)
+const isRefreshing = ref(false)
+
+async function refreshNodes() {
+  isRefreshing.value = true
+  await store.fetchNodes()
+  setTimeout(() => { isRefreshing.value = false }, 300)
+}
 
 onMounted(() => {
   store.fetchNodes()
   store.fetchNamespaces()
+  // Auto-refresh nodes every 5 seconds
+  refreshInterval.value = window.setInterval(() => {
+    store.fetchNodes()
+  }, 5000)
+})
+
+onUnmounted(() => {
+  if (refreshInterval.value) {
+    clearInterval(refreshInterval.value)
+  }
 })
 
 const readyNodes = computed(() => store.nodes.filter(n => n.status === 'Ready').length)
@@ -137,7 +155,30 @@ function getProgressColor(percent: number): string {
 
     <!-- Nodes -->
     <div>
-      <h3 class="text-lg font-semibold mb-4">Nodes</h3>
+      <div class="flex items-center gap-3 mb-4">
+        <h3 class="text-lg font-semibold">Nodes</h3>
+        <button
+          @click="refreshNodes"
+          class="p-1.5 rounded hover:bg-gray-700 transition-colors"
+          title="Refresh"
+        >
+          <svg
+            class="w-4 h-4 text-gray-400"
+            :class="{ 'animate-spin': isRefreshing }"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+        </button>
+        <span class="text-xs text-gray-500">auto-refresh 5s</span>
+      </div>
       <div v-if="store.loading" class="text-gray-400">Loading...</div>
       <div v-else-if="store.error" class="text-red-400">{{ store.error }}</div>
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
