@@ -5,15 +5,15 @@ type Node struct {
 	Status    string            `json:"status"`
 	Roles     []string          `json:"roles"`
 	IP        string            `json:"ip"`
-	CPU       ResourceUsage     `json:"cpu"`
-	Memory    ResourceUsage     `json:"memory"`
+	CPU       ResourceInfo      `json:"cpu"`
+	Memory    ResourceInfo      `json:"memory"`
 	Labels    map[string]string `json:"labels"`
 	CreatedAt string            `json:"createdAt"`
 }
 
-type ResourceUsage struct {
-	Capacity    string `json:"capacity"`
-	Allocatable string `json:"allocatable"`
+type ResourceInfo struct {
+	Allocatable int64 `json:"allocatable"` // millicores for CPU, bytes for memory
+	Usage       int64 `json:"usage"`       // millicores for CPU, bytes for memory
 }
 
 type Namespace struct {

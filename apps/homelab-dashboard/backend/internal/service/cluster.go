@@ -6,16 +6,18 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	metricsv "k8s.io/metrics/pkg/client/clientset/versioned"
 
 	"homelab-dashboard/internal/model"
 )
 
 type ClusterService struct {
-	client *kubernetes.Clientset
+	client        *kubernetes.Clientset
+	metricsClient *metricsv.Clientset
 }
 
-func NewClusterService(client *kubernetes.Clientset) *ClusterService {
-	return &ClusterService{client: client}
+func NewClusterService(client *kubernetes.Clientset, metricsClient *metricsv.Clientset) *ClusterService {
+	return &ClusterService{client: client, metricsClient: metricsClient}
 }
 
 func (s *ClusterService) GetNodes(ctx context.Context) ([]model.Node, error) {
@@ -24,8 +26,31 @@ func (s *ClusterService) GetNodes(ctx context.Context) ([]model.Node, error) {
 		return nil, err
 	}
 
+	// Fetch metrics
+	metricsMap := make(map[string]struct {
+		cpuUsage    int64
+		memoryUsage int64
+	})
+
+	if s.metricsClient != nil {
+		nodeMetrics, err := s.metricsClient.MetricsV1beta1().NodeMetricses().List(ctx, metav1.ListOptions{})
+		if err == nil {
+			for _, m := range nodeMetrics.Items {
+				metricsMap[m.Name] = struct {
+					cpuUsage    int64
+					memoryUsage int64
+				}{
+					cpuUsage:    m.Usage.Cpu().MilliValue(),
+					memoryUsage: m.Usage.Memory().Value(),
+				}
+			}
+		}
+	}
+
 	result := make([]model.Node, 0, len(nodes.Items))
 	for _, n := range nodes.Items {
+		metrics := metricsMap[n.Name]
+
 		node := model.Node{
 			Name:      n.Name,
 			Status:    getNodeStatus(n),
@@ -33,13 +58,13 @@ func (s *ClusterService) GetNodes(ctx context.Context) ([]model.Node, error) {
 			IP:        getNodeIP(n),
 			Labels:    n.Labels,
 			CreatedAt: n.CreationTimestamp.Format("2006-01-02T15:04:05Z"),
-			CPU: model.ResourceUsage{
-				Capacity:    n.Status.Capacity.Cpu().String(),
-				Allocatable: n.Status.Allocatable.Cpu().String(),
+			CPU: model.ResourceInfo{
+				Allocatable: n.Status.Allocatable.Cpu().MilliValue(),
+				Usage:       metrics.cpuUsage,
 			},
-			Memory: model.ResourceUsage{
-				Capacity:    n.Status.Capacity.Memory().String(),
-				Allocatable: n.Status.Allocatable.Memory().String(),
+			Memory: model.ResourceInfo{
+				Allocatable: n.Status.Allocatable.Memory().Value(),
+				Usage:       metrics.memoryUsage,
 			},
 		}
 		result = append(result, node)

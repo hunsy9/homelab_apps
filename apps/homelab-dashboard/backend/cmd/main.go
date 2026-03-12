@@ -12,12 +12,12 @@ import (
 )
 
 func main() {
-	client, err := k8s.NewClient()
+	clients, err := k8s.NewClients()
 	if err != nil {
-		log.Fatalf("Failed to create k8s client: %v", err)
+		log.Fatalf("Failed to create k8s clients: %v", err)
 	}
 
-	clusterSvc := service.NewClusterService(client)
+	clusterSvc := service.NewClusterService(clients.Kubernetes, clients.Metrics)
 	clusterHandler := handler.NewClusterHandler(clusterSvc)
 
 	e := echo.New()
