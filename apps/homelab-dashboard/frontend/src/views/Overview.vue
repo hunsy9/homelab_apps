@@ -111,7 +111,7 @@ function getProgressColor(percent: number): string {
     <!-- Services -->
     <div>
       <h2 class="text-lg font-semibold text-foreground mb-4">Services</h2>
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
         <a
           v-for="service in services"
           :key="service.name"
@@ -150,7 +150,7 @@ function getProgressColor(percent: number): string {
 
       <div v-if="store.loading" class="text-muted-foreground">Loading...</div>
       <div v-else-if="store.error" class="text-red-500">{{ store.error }}</div>
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <div
           v-for="node in store.nodes"
           :key="node.name"

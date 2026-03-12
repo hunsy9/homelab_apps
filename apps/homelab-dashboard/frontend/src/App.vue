@@ -1,15 +1,51 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { ref } from 'vue'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
+
+const sidebarOpen = ref(false)
+const route = useRoute()
+
+function closeSidebar() {
+  sidebarOpen.value = false
+}
 </script>
 
 <template>
   <div class="min-h-screen bg-background flex">
+    <!-- Mobile header -->
+    <header class="md:hidden fixed top-0 left-0 right-0 h-14 bg-card border-b flex items-center px-4 z-40">
+      <button @click="sidebarOpen = true" class="p-2 -ml-2 rounded-md hover:bg-accent">
+        <svg class="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <h1 class="text-lg font-semibold text-foreground ml-3">Homelab</h1>
+    </header>
+
+    <!-- Mobile overlay -->
+    <div
+      v-if="sidebarOpen"
+      class="md:hidden fixed inset-0 bg-black/50 z-40"
+      @click="closeSidebar"
+    ></div>
+
     <!-- Sidebar -->
-    <aside class="w-64 border-r bg-card p-6">
-      <h1 class="text-xl font-semibold mb-8 text-foreground">Homelab</h1>
+    <aside
+      class="fixed md:static inset-y-0 left-0 w-64 border-r bg-card p-6 z-50 transform transition-transform duration-200 ease-in-out md:transform-none"
+      :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+    >
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-xl font-semibold text-foreground">Homelab</h1>
+        <button @click="closeSidebar" class="md:hidden p-1 rounded-md hover:bg-accent">
+          <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
       <nav class="space-y-1">
         <RouterLink
           to="/"
+          @click="closeSidebar"
           class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
           active-class="bg-secondary text-foreground"
         >
@@ -20,6 +56,7 @@ import { RouterLink, RouterView } from 'vue-router'
         </RouterLink>
         <RouterLink
           to="/namespaces"
+          @click="closeSidebar"
           class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
           active-class="bg-secondary text-foreground"
         >
@@ -32,7 +69,7 @@ import { RouterLink, RouterView } from 'vue-router'
     </aside>
 
     <!-- Main content -->
-    <main class="flex-1 p-8 bg-muted/30">
+    <main class="flex-1 p-4 md:p-8 bg-muted/30 pt-18 md:pt-8">
       <RouterView />
     </main>
   </div>

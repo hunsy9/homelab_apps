@@ -58,8 +58,8 @@ onMounted(loadData)
     <div v-else-if="store.error" class="text-red-500">{{ store.error }}</div>
 
     <!-- Pods Table -->
-    <div v-else-if="activeTab === 'pods'" class="bg-card rounded-lg border overflow-hidden">
-      <table class="w-full">
+    <div v-else-if="activeTab === 'pods'" class="bg-card rounded-lg border overflow-hidden overflow-x-auto">
+      <table class="w-full min-w-[600px]">
         <thead class="bg-muted/50">
           <tr>
             <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
@@ -104,8 +104,8 @@ onMounted(loadData)
     </div>
 
     <!-- Services Table -->
-    <div v-else-if="activeTab === 'services'" class="bg-card rounded-lg border overflow-hidden">
-      <table class="w-full">
+    <div v-else-if="activeTab === 'services'" class="bg-card rounded-lg border overflow-hidden overflow-x-auto">
+      <table class="w-full min-w-[500px]">
         <thead class="bg-muted/50">
           <tr>
             <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
