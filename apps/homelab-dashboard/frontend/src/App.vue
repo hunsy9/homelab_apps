@@ -16,13 +16,6 @@ import { RouterLink, RouterView } from 'vue-router'
           Overview
         </RouterLink>
         <RouterLink
-          to="/nodes"
-          class="block px-4 py-2 rounded hover:bg-gray-700 transition"
-          active-class="bg-blue-600"
-        >
-          Nodes
-        </RouterLink>
-        <RouterLink
           to="/namespaces"
           class="block px-4 py-2 rounded hover:bg-gray-700 transition"
           active-class="bg-blue-600"

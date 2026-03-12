@@ -14,6 +14,13 @@ const totalNodes = computed(() => store.nodes.length)
 
 const services = [
   {
+    name: 'ArgoCD',
+    url: 'https://argocd.seung.site',
+    description: 'GitOps Continuous Delivery',
+    icon: '🔄',
+    color: 'from-orange-500 to-red-500'
+  },
+  {
     name: 'Traefik',
     url: 'https://traefik.seung.site/dashboard/',
     description: 'Ingress Controller Dashboard',
@@ -40,15 +47,35 @@ const services = [
     description: 'Container Registry',
     icon: '🐳',
     color: 'from-blue-500 to-indigo-500'
-  },
-  {
-    name: 'Hello World',
-    url: 'https://hello.seung.site',
-    description: 'Test Application',
-    icon: '👋',
-    color: 'from-green-500 to-teal-500'
   }
 ]
+
+function formatCPU(millicores: number): string {
+  if (millicores >= 1000) {
+    return `${(millicores / 1000).toFixed(1)} cores`
+  }
+  return `${millicores}m`
+}
+
+function formatMemory(bytes: number): string {
+  const gb = bytes / (1024 * 1024 * 1024)
+  if (gb >= 1) {
+    return `${gb.toFixed(1)} GB`
+  }
+  const mb = bytes / (1024 * 1024)
+  return `${mb.toFixed(0)} MB`
+}
+
+function getUsagePercent(usage: number, allocatable: number): number {
+  if (allocatable === 0) return 0
+  return Math.min(100, (usage / allocatable) * 100)
+}
+
+function getProgressColor(percent: number): string {
+  if (percent >= 90) return 'bg-red-500'
+  if (percent >= 70) return 'bg-yellow-500'
+  return 'bg-green-500'
+}
 </script>
 
 <template>
@@ -108,26 +135,63 @@ const services = [
       </div>
     </div>
 
-    <!-- Node list preview -->
-    <div class="bg-gray-800 rounded-lg p-6">
+    <!-- Nodes -->
+    <div>
       <h3 class="text-lg font-semibold mb-4">Nodes</h3>
       <div v-if="store.loading" class="text-gray-400">Loading...</div>
       <div v-else-if="store.error" class="text-red-400">{{ store.error }}</div>
-      <div v-else class="space-y-2">
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <div
           v-for="node in store.nodes"
           :key="node.name"
-          class="flex items-center justify-between p-3 bg-gray-700 rounded"
+          class="bg-gray-800 rounded-lg p-4"
         >
-          <div class="flex items-center gap-3">
-            <span
-              class="w-3 h-3 rounded-full"
-              :class="node.status === 'Ready' ? 'bg-green-500' : 'bg-red-500'"
-            ></span>
-            <span class="font-medium">{{ node.name }}</span>
-            <span class="text-gray-400 text-sm">{{ node.roles.join(', ') }}</span>
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span
+                class="w-2.5 h-2.5 rounded-full"
+                :class="node.status === 'Ready' ? 'bg-green-500' : 'bg-red-500'"
+              ></span>
+              <span class="font-semibold">{{ node.name }}</span>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded bg-gray-700 text-gray-400">
+              {{ node.roles.join(', ') }}
+            </span>
           </div>
-          <span class="text-gray-400">{{ node.ip }}</span>
+
+          <!-- IP -->
+          <div class="text-xs text-gray-500 mb-3">{{ node.ip }}</div>
+
+          <!-- CPU -->
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-gray-400 mb-1">
+              <span>CPU</span>
+              <span>{{ formatCPU(node.cpu.usage) }} / {{ formatCPU(node.cpu.allocatable) }}</span>
+            </div>
+            <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div
+                class="h-full rounded-full transition-all"
+                :class="getProgressColor(getUsagePercent(node.cpu.usage, node.cpu.allocatable))"
+                :style="{ width: `${getUsagePercent(node.cpu.usage, node.cpu.allocatable)}%` }"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Memory -->
+          <div>
+            <div class="flex justify-between text-xs text-gray-400 mb-1">
+              <span>Memory</span>
+              <span>{{ formatMemory(node.memory.usage) }} / {{ formatMemory(node.memory.allocatable) }}</span>
+            </div>
+            <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div
+                class="h-full rounded-full transition-all"
+                :class="getProgressColor(getUsagePercent(node.memory.usage, node.memory.allocatable))"
+                :style="{ width: `${getUsagePercent(node.memory.usage, node.memory.allocatable)}%` }"
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
