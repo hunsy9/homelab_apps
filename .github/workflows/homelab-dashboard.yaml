@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'apps/homelab-dashboard/**'
+      - '!apps/homelab-dashboard/k8s/**'
     branches:
       - main
   workflow_dispatch:
@@ -19,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to Harbor
         run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login ${{ env.REGISTRY }} -u ${{ secrets.HARBOR_USERNAME }} --password-stdin
@@ -33,3 +36,15 @@ jobs:
         run: |
           docker push ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Update deployment manifest
+        run: |
+          sed -i "s|image: harbor.seung.site/homelab/homelab-dashboard:.*|image: harbor.seung.site/homelab/homelab-dashboard:${{ github.sha }}|" apps/homelab-dashboard/k8s/deployment.yaml
+
+      - name: Commit and push manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add apps/homelab-dashboard/k8s/deployment.yaml
+          git diff --staged --quiet || git commit -m "chore: Update homelab-dashboard image to ${{ github.sha }}"
+          git push
