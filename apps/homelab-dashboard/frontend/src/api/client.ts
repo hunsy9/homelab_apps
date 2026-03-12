@@ -8,13 +8,18 @@ async function fetchApi<T>(path: string): Promise<T> {
   return response.json()
 }
 
+export interface ResourceInfo {
+  allocatable: number
+  usage: number
+}
+
 export interface Node {
   name: string
   status: string
   roles: string[]
   ip: string
-  cpu: { capacity: string; allocatable: string }
-  memory: { capacity: string; allocatable: string }
+  cpu: ResourceInfo
+  memory: ResourceInfo
   labels: Record<string, string>
   createdAt: string
 }
