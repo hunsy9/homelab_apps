@@ -1,0 +1,35 @@
+name: Build and Push homelab-dashboard
+
+on:
+  push:
+    paths:
+      - 'apps/homelab-dashboard/**'
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: homelab-dashboard
+  REGISTRY: harbor.seung.site
+  PROJECT: homelab
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Harbor
+        run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login ${{ env.REGISTRY }} -u ${{ secrets.HARBOR_USERNAME }} --password-stdin
+
+      - name: Build image
+        run: |
+          cd apps/homelab-dashboard
+          docker build -t ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker tag ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Push image
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT }}/${{ env.IMAGE_NAME }}:latest
