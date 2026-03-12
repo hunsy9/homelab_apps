@@ -11,7 +11,10 @@ export const useClusterStore = defineStore('cluster', () => {
   const error = ref<string | null>(null)
 
   async function fetchNodes() {
-    loading.value = true
+    // Only show loading on initial fetch
+    if (nodes.value.length === 0) {
+      loading.value = true
+    }
     error.value = null
     try {
       nodes.value = await api.getNodes()
